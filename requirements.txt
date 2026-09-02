@@ -1,0 +1,15 @@
+accelerate
+datasets
+Flask
+Flask-Cors
+joblib
+matplotlib
+numpy
+pandas
+peft
+safetensors
+scikit-learn
+seaborn
+tensorflow
+torch
+transformers
