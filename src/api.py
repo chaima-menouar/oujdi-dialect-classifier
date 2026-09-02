@@ -4,12 +4,14 @@ from flask_cors import CORS
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from peft import PeftModel
+from pathlib import Path
 
 app = Flask(__name__)
 CORS(app)
 
 BASE_MODEL = "distilbert-base-multilingual-cased"
-LORA_PATH = "models/transformer_lora/checkpoint-20000"
+BASE_DIR = Path(__file__).resolve().parent.parent
+LORA_PATH = BASE_DIR / "models" / "transformer_lora"
 
 print("Loading tokenizer...")
 tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL, use_fast=False)
@@ -21,7 +23,7 @@ base_model = AutoModelForSequenceClassification.from_pretrained(
 )
 
 print("Loading LoRA adapter...")
-model = PeftModel.from_pretrained(base_model, LORA_PATH)
+model = PeftModel.from_pretrained(base_model, str(LORA_PATH))
 model.eval()
 
 id2label = {
