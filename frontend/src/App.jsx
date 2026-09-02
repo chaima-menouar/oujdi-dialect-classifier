@@ -216,7 +216,7 @@ export default function WelcomePage() {
             fontSize:12,color:M[300],...f(0.1),
           }}>
             <span style={{width:7,height:7,borderRadius:"50%",background:"#4ade80",display:"inline-block"}}/>
-            97.22% de précision · DistilBERT + LoRA
+            97.59% de précision · DistilBERT + LoRA
           </div>
 
           <h1 style={{
