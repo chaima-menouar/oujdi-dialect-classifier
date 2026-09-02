@@ -1,5 +1,3 @@
----
-
 base_model: distilbert-base-multilingual-cased
 library_name: peft
 pipeline_tag: text-classification
