@@ -93,7 +93,7 @@ const FEATURES = [
 ];
 
 const STATS = [
-  {n:"97.22%", l:"Précision"},
+  {n:"97.59%", l:"Précision"},
   {n:"100K", l:"Échantillons"},
   {n:"50K", l:"Oujdi"},
   {n:"50K", l:"Moroccan"},
