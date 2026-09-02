@@ -187,7 +187,7 @@ def main():
 
 
 
-       trainer.train()
+    trainer.train()
 
     print("\nValidation evaluation:")
     print(trainer.evaluate(val_dataset))
