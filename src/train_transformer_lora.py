@@ -184,7 +184,10 @@ def main():
         compute_metrics=compute_metrics
     )
 
-    trainer.train(resume_from_checkpoint="models/transformer_lora/checkpoint-10000")
+
+
+
+       trainer.train()
 
     print("\nValidation evaluation:")
     print(trainer.evaluate(val_dataset))
