@@ -2,9 +2,12 @@ import pandas as pd
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from peft import PeftModel
+from pathlib import Path
 
 BASE_MODEL = "distilbert-base-multilingual-cased"
-LORA_PATH = "models/transformer_lora/checkpoint-20000"
+BASE_DIR = Path(__file__).resolve().parent.parent
+LORA_PATH = BASE_DIR / "models" / "transformer_lora"
+DATASET_PATH = BASE_DIR / "data" / "dataset.csv"
 
 id2label = {0: "moroccan", 1: "oujdi"}
 
@@ -15,10 +18,10 @@ base_model = AutoModelForSequenceClassification.from_pretrained(
     num_labels=2
 )
 
-model = PeftModel.from_pretrained(base_model, LORA_PATH)
+model = PeftModel.from_pretrained(base_model, str(LORA_PATH))
 model.eval()
 
-df = pd.read_csv("data/dataset.csv")
+df = pd.read_csv(DATASET_PATH)
 
 samples = pd.concat([
     df[df["label"] == "oujdi"].head(10),
