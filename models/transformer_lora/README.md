@@ -1,206 +1,115 @@
 ---
+
 base_model: distilbert-base-multilingual-cased
 library_name: peft
-tags:
-- base_model:adapter:distilbert-base-multilingual-cased
-- lora
-- transformers
+pipeline_tag: text-classification
+language:
+
+* ar
+  tags:
+* darija
+* moroccan-arabic
+* oujdi
+* text-classification
+* transformers
+* lora
+* peft
+
 ---
 
-# Model Card for Model ID
+# Oujdi Dialect Classification Model
 
-<!-- Provide a quick summary of what the model is/does. -->
+This model classifies short text as either Oujdi, the regional dialect spoken in Eastern Morocco, or general Moroccan Darija.
 
+It is a LoRA adapter fine-tuned on top of `distilbert-base-multilingual-cased` for binary sequence classification. The model supports Arabic, Latin, and mixed-script text.
 
+## Labels
 
-## Model Details
+| Label ID | Class           |
+| -------: | --------------- |
+|        0 | Moroccan Darija |
+|        1 | Oujdi           |
 
-### Model Description
+## Dataset
 
-<!-- Provide a longer summary of what this model is. -->
+The model was trained on a balanced dataset containing 100,000 text samples:
 
+| Class           | Samples |
+| --------------- | ------: |
+| Oujdi           |  50,000 |
+| Moroccan Darija |  50,000 |
 
+The Moroccan Darija samples were prepared from the Darija Open Dataset. The Oujdi samples were prepared from a 220,000-line corpus created by the project team.
 
-- **Developed by:** [More Information Needed]
-- **Funded by [optional]:** [More Information Needed]
-- **Shared by [optional]:** [More Information Needed]
-- **Model type:** [More Information Needed]
-- **Language(s) (NLP):** [More Information Needed]
-- **License:** [More Information Needed]
-- **Finetuned from model [optional]:** [More Information Needed]
+The final dataset was divided into:
 
-### Model Sources [optional]
+* 80% training data
+* 10% validation data
+* 10% test data
 
-<!-- Provide the basic links for the model. -->
+## Training Configuration
 
-- **Repository:** [More Information Needed]
-- **Paper [optional]:** [More Information Needed]
-- **Demo [optional]:** [More Information Needed]
-
-## Uses
-
-<!-- Address questions around how the model is intended to be used, including the foreseeable users of the model and those affected by the model. -->
-
-### Direct Use
-
-<!-- This section is for the model use without fine-tuning or plugging into a larger ecosystem/app. -->
-
-[More Information Needed]
-
-### Downstream Use [optional]
-
-<!-- This section is for the model use when fine-tuned for a task, or when plugged into a larger ecosystem/app -->
-
-[More Information Needed]
-
-### Out-of-Scope Use
-
-<!-- This section addresses misuse, malicious use, and uses that the model will not work well for. -->
-
-[More Information Needed]
-
-## Bias, Risks, and Limitations
-
-<!-- This section is meant to convey both technical and sociotechnical limitations. -->
-
-[More Information Needed]
-
-### Recommendations
-
-<!-- This section is meant to convey recommendations with respect to the bias, risk, and technical limitations. -->
-
-Users (both direct and downstream) should be made aware of the risks, biases and limitations of the model. More information needed for further recommendations.
-
-## How to Get Started with the Model
-
-Use the code below to get started with the model.
-
-[More Information Needed]
-
-## Training Details
-
-### Training Data
-
-<!-- This should link to a Dataset Card, perhaps with a short stub of information on what the training data is all about as well as documentation related to data pre-processing or additional filtering. -->
-
-[More Information Needed]
-
-### Training Procedure
-
-<!-- This relates heavily to the Technical Specifications. Content here should link to that section when it is relevant to the training procedure. -->
-
-#### Preprocessing [optional]
-
-[More Information Needed]
-
-
-#### Training Hyperparameters
-
-- **Training regime:** [More Information Needed] <!--fp32, fp16 mixed precision, bf16 mixed precision, bf16 non-mixed precision, fp16 non-mixed precision, fp8 mixed precision -->
-
-#### Speeds, Sizes, Times [optional]
-
-<!-- This section provides information about throughput, start/end time, checkpoint size if relevant, etc. -->
-
-[More Information Needed]
+| Parameter               | Value                                |
+| ----------------------- | ------------------------------------ |
+| Base model              | `distilbert-base-multilingual-cased` |
+| LoRA rank               | 8                                    |
+| LoRA alpha              | 16                                   |
+| LoRA dropout            | 0.1                                  |
+| Target modules          | `q_lin`, `v_lin`                     |
+| Maximum sequence length | 128                                  |
+| Epochs                  | 2                                    |
+| Batch size              | 8                                    |
+| Learning rate           | 0.0002                               |
+| Weight decay            | 0.01                                 |
 
 ## Evaluation
 
-<!-- This section describes the evaluation protocols and provides the results. -->
+The model achieved a test accuracy of **97.59%** on the balanced evaluation dataset.
 
-### Testing Data, Factors & Metrics
+Results should be interpreted within the scope of the collected data. Performance may decrease on very short, ambiguous, or previously unseen regional expressions.
 
-#### Testing Data
+## Usage
 
-<!-- This should link to a Dataset Card if possible. -->
+The adapter must be loaded with its original multilingual DistilBERT base model.
 
-[More Information Needed]
+```python
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from peft import PeftModel
 
-#### Factors
+base_model_name = "distilbert-base-multilingual-cased"
+adapter_path = "models/transformer_lora"
 
-<!-- These are the things the evaluation is disaggregating by, e.g., subpopulations or domains. -->
+tokenizer = AutoTokenizer.from_pretrained(base_model_name)
 
-[More Information Needed]
+base_model = AutoModelForSequenceClassification.from_pretrained(
+    base_model_name,
+    num_labels=2
+)
 
-#### Metrics
+model = PeftModel.from_pretrained(base_model, adapter_path)
+model.eval()
+```
 
-<!-- These are the evaluation metrics being used, ideally with a description of why. -->
+## Limitations
 
-[More Information Needed]
+* The model performs binary classification only.
+* Oujdi and other Moroccan dialects can share vocabulary and spelling.
+* Very short or ambiguous text may produce unreliable predictions.
+* The model may reflect limitations or biases present in the training data.
+* The current version is intended for research and educational use.
 
-### Results
+## Authors
 
-[More Information Needed]
+Developed by Chaima Menouar and Mohammed Oulhadj under the supervision of Prof. Mohamed Cherradi.
 
-#### Summary
+## Data and Usage Terms
 
+The Moroccan Darija portion is derived from the Darija Open Dataset and is subject to the CC BY-NC 4.0 license.
 
+The Oujdi corpus was created by the project team and has not been separately licensed for redistribution. Contact the project authors before redistributing the corpus or using it commercially.
 
-## Model Examination [optional]
+## Project Repository
 
-<!-- Relevant interpretability work for the model goes here -->
+Full source code, evaluation results, API, interface, and research report:
 
-[More Information Needed]
-
-## Environmental Impact
-
-<!-- Total emissions (in grams of CO2eq) and additional considerations, such as electricity usage, go here. Edit the suggested text below accordingly -->
-
-Carbon emissions can be estimated using the [Machine Learning Impact calculator](https://mlco2.github.io/impact#compute) presented in [Lacoste et al. (2019)](https://arxiv.org/abs/1910.09700).
-
-- **Hardware Type:** [More Information Needed]
-- **Hours used:** [More Information Needed]
-- **Cloud Provider:** [More Information Needed]
-- **Compute Region:** [More Information Needed]
-- **Carbon Emitted:** [More Information Needed]
-
-## Technical Specifications [optional]
-
-### Model Architecture and Objective
-
-[More Information Needed]
-
-### Compute Infrastructure
-
-[More Information Needed]
-
-#### Hardware
-
-[More Information Needed]
-
-#### Software
-
-[More Information Needed]
-
-## Citation [optional]
-
-<!-- If there is a paper or blog post introducing the model, the APA and Bibtex information for that should go in this section. -->
-
-**BibTeX:**
-
-[More Information Needed]
-
-**APA:**
-
-[More Information Needed]
-
-## Glossary [optional]
-
-<!-- If relevant, include terms and calculations in this section that can help readers understand the model or model card. -->
-
-[More Information Needed]
-
-## More Information [optional]
-
-[More Information Needed]
-
-## Model Card Authors [optional]
-
-[More Information Needed]
-
-## Model Card Contact
-
-[More Information Needed]
-### Framework versions
-
-- PEFT 0.19.1
+https://github.com/chaima-menouar/oujdi-dialect-classifier
