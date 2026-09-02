@@ -1,20 +1,3 @@
-base_model: distilbert-base-multilingual-cased
-library_name: peft
-pipeline_tag: text-classification
-language:
-
-* ar
-  tags:
-* darija
-* moroccan-arabic
-* oujdi
-* text-classification
-* transformers
-* lora
-* peft
-
-
-
 # Oujdi Dialect Classification Model
 
 This model classifies short text as either Oujdi, the regional dialect spoken in Eastern Morocco, or general Moroccan Darija.
